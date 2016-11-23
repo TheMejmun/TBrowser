@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">TBrowser</string>
 
-    <string name="search_box_hint"></string>
+    <string name="search_box_hint">http://</string>
 
     <string name="reload">Reload</string>
     <string name="stop">Stop</string>

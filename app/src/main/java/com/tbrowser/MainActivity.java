@@ -2,14 +2,12 @@ package com.tbrowser;
 
 import android.Manifest;
 import android.content.Context;
-import android.inputmethodservice.Keyboard;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -32,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     Menu menu;
     Animation rotation;
     ImageView loadingIcon;
+    static boolean asyncTaskRunning = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,13 +41,17 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.INTERNET}, 404);
 
+        // Set up everything
         Toolbar tb = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(tb);
         ab = getSupportActionBar();
         searchbox = (EditText) findViewById(R.id.searchbox);
+        loadingIcon = (ImageView) findViewById(R.id.loading_icon);
+
+        // Animation
         rotation = AnimationUtils.loadAnimation(this, R.anim.rotation);
         rotation.setRepeatCount(Animation.INFINITE);
-        loadingIcon = (ImageView) findViewById(R.id.loading_icon);
+
 
         // When Enter is pressed
         searchbox.setOnKeyListener(new View.OnKeyListener() {
@@ -56,10 +59,14 @@ public class MainActivity extends AppCompatActivity {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 if (keyCode == KeyEvent.KEYCODE_ENTER) {
 
-                    // Load URL
-                    if (!searchbox.getText().toString().trim().isEmpty()) {
-                        loadurl = new loadURL();
-                        loadurl.execute(searchbox.getText().toString());
+                    if (asyncTaskRunning) {
+                        // TODO Something when trying to load again
+                    } else {
+                        // Load URL
+                        if (!searchbox.getText().toString().trim().isEmpty()) {
+                            loadurl = new loadURL();
+                            loadurl.execute(searchbox.getText().toString());
+                        }
                     }
 
                     // Hide Keyboard
@@ -68,17 +75,6 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 }
                 return false;
-            }
-        });
-
-        searchbox.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (hasFocus) {
-                    Log.i("searchbox", "focused");
-                } else {
-                    Log.i("searchbox", "not focused");
-                }
             }
         });
     }
@@ -93,12 +89,14 @@ public class MainActivity extends AppCompatActivity {
             reloadButton = menu.findItem(R.id.menu_load);
             reloadButton.setIcon(R.drawable.ic_autorenew_white_48dp);
             reloadButton.setTitle(R.string.reload);
+            asyncTaskRunning = false;
             super.onPostExecute(s);
         }
 
         @Override
         protected void onPreExecute() {
             // Graphix
+            asyncTaskRunning = true;
             loadingIcon.setAnimation(rotation);
             loadingIcon.animate();
             loadingIcon.setVisibility(View.VISIBLE);
@@ -121,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
             reloadButton = menu.findItem(R.id.menu_load);
             reloadButton.setIcon(R.drawable.ic_autorenew_white_48dp);
             reloadButton.setTitle(R.string.reload);
+            asyncTaskRunning = false;
             super.onCancelled(s);
         }
 

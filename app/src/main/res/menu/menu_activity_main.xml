@@ -6,6 +6,6 @@
         android:id="@+id/menu_load"
         android:icon="@drawable/ic_autorenew_white_48dp"
         android:title="@string/reload"
-        app:showAsAction="always" />
+        app:showAsAction="always"/>
 
 </menu>
