@@ -5,4 +5,5 @@
 
     <string name="reload">Reload</string>
     <string name="stop">Stop</string>
+    <string name="load">Load</string>
 </resources>
